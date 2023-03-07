@@ -56,31 +56,34 @@ abstract class DataClass implements JsonSerializable
 
 		foreach($props as $name => $value)
 		{
-			$propInfo = static::$__cache__[static::class]['prop_info'][$name];
-
-			if($propInfo['dataclass'] !== null)
+			if($value !== null)
 			{
-				if($propInfo['is_array'])
+				$propInfo = static::$__cache__[static::class]['prop_info'][$name];
+
+				if($propInfo['dataclass'] !== null)
 				{
-					$dataclasses = [];
-
-					foreach($value as $valueData)
+					if($propInfo['is_array'])
 					{
-						$dataclasses[] = new $propInfo['dataclass'](...$valueData);
-					}
+						$dataclasses = [];
 
-					$value = $dataclasses;
+						foreach($value as $valueData)
+						{
+							$dataclasses[] = new $propInfo['dataclass'](...$valueData);
+						}
+
+						$value = $dataclasses;
+					}
+					else
+					{
+						$value = new $propInfo['dataclass'](...$value);
+					}
 				}
 				else
 				{
-					$value = new $propInfo['dataclass'](...$value);
-				}
-			}
-			else
-			{
-				foreach($propInfo['validators'] as $validator)
-				{
-					$value = $this->{$validator}($value);
+					foreach($propInfo['validators'] as $validator)
+					{
+						$value = $this->{$validator}($value);
+					}
 				}
 			}
 
