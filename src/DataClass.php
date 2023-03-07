@@ -22,7 +22,7 @@ use stdClass;
 abstract class DataClass implements JsonSerializable
 {
 	/**
-	 * Validator cache.
+	 * Property info cache.
 	 */
 	protected static array $__cache__ = [];
 
@@ -31,42 +31,42 @@ abstract class DataClass implements JsonSerializable
 	 */
 	final public function __construct(...$props)
 	{
-		// Cache validators and prop details
+		// Cache property details
 
 		if(array_key_exists(static::class, static::$__cache__) === false)
 		{
-			static::cacheValidatorsAndPropDetails();
+			static::cachePropDetails();
 		}
 
-		// Check for missing required props
+		// Check for missing required properties
 
 		if(!empty($missing = array_diff_key(static::$__cache__[static::class]['required_props'], $props)))
 		{
 			throw new RuntimeException(vsprintf('Missing required %s: %s.', [count($missing) > 1 ? 'properties' : 'property', implode(',', $missing)]));
 		}
 
-		// Initialize props
+		// Initialize properties
 
 		foreach($props as $name => $value)
 		{
 			$propInfo = static::$__cache__[static::class]['prop_info'][$name];
 
-			if($propInfo['model'] !== null)
+			if($propInfo['dataclass'] !== null)
 			{
 				if($propInfo['is_array'])
 				{
-					$models = [];
+					$dataclasses = [];
 
 					foreach($value as $valueData)
 					{
-						$models[] = new $propInfo['model'](...$valueData);
+						$dataclasses[] = new $propInfo['dataclass'](...$valueData);
 					}
 
-					$value = $models;
+					$value = $dataclasses;
 				}
 				else
 				{
-					$value = new $propInfo['model'](...$value);
+					$value = new $propInfo['dataclass'](...$value);
 				}
 			}
 			else
@@ -82,9 +82,9 @@ abstract class DataClass implements JsonSerializable
 	}
 
 	/**
-	 * Caches validators and prop details.
+	 * Caches property details.
 	 */
-	final protected static function cacheValidatorsAndPropDetails(): void
+	final protected static function cachePropDetails(): void
 	{
 		static::$__cache__[static::class] = [
 			'required_props' => [],
@@ -102,17 +102,17 @@ abstract class DataClass implements JsonSerializable
 			static::$__cache__[static::class]['prop_info'][$propName] = [
 				'validators' => [],
 				'is_array'   => false,
-				'model'      => null,
+				'dataclass'  => null,
 			];
 
-			// Cache required props
+			// Cache required properties
 
 			if($prop->hasDefaultValue() === false)
 			{
 				static::$__cache__[static::class]['required_props'][$propName] = $propName;
 			}
 
-			// Cache prop info
+			// Cache property information
 
 			$type = $prop->getType();
 
@@ -128,7 +128,7 @@ abstract class DataClass implements JsonSerializable
 
 						if(!empty($attributes))
 						{
-							static::$__cache__[static::class]['prop_info'][$propName]['model'] = $attributes[0]->newInstance()->getType();
+							static::$__cache__[static::class]['prop_info'][$propName]['dataclass'] = $attributes[0]->newInstance()->getType();
 						}
 					}
 				}
@@ -138,13 +138,13 @@ abstract class DataClass implements JsonSerializable
 
 					if(in_array(self::class, class_parents($typeName)))
 					{
-						static::$__cache__[static::class]['prop_info'][$propName]['model'] = $typeName;
+						static::$__cache__[static::class]['prop_info'][$propName]['dataclass'] = $typeName;
 					}
 				}
 			}
 		}
 
-		// Cache validators
+		// Cache property validators
 
 		foreach($reflection->getMethods() as $method)
 		{
@@ -160,7 +160,7 @@ abstract class DataClass implements JsonSerializable
 	}
 
 	/**
-	 * Returns an array representation of the model.
+	 * Returns an array representation of the data class.
 	 */
 	final public function toArray(): array
 	{
@@ -181,7 +181,7 @@ abstract class DataClass implements JsonSerializable
 	}
 
 	/**
-	 * Returns a stdClass representation of the model.
+	 * Returns a stdClass representation of the data class.
 	 */
 	final public function toObject(): stdClass
 	{
