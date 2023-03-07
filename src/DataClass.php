@@ -16,6 +16,13 @@ use ReflectionProperty;
 use RuntimeException;
 use stdClass;
 
+use function array_diff_key;
+use function class_parents;
+use function count;
+use function implode;
+use function in_array;
+use function vsprintf;
+
 /**
  * Data class.
  */
