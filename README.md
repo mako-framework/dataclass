@@ -97,12 +97,42 @@ class User extends DataClass
 	public Avatar $avatar;
 }
 
-// The avatar property will be instantiated as a Avatar instance
+// The avatar property will be instantiated as an Avatar instance
 
 $user = new User(
 	username: 'freost',
 	email: 'freost@example.org',
 	avatar: ['url' => 'https://example.org/avatar.png'],
+);
+```
 
+### Arrays of nested data classes
+
+```php
+<?php
+
+use mako\dataclass\DataClass;
+use mako\dataclass\attributes\ArrayOf;
+use mako\dataclass\attributes\Validator;
+
+class Avatar extends DataClass
+{
+	public string $url;
+}
+
+class User extends DataClass
+{
+	public string $username;
+	public string $email;
+	#[ArrayOf(Avatar::class)]
+	public array $avatars;
+}
+
+// The elements of the avatars property will be instantiated as Avatar instances
+
+$user = new User(
+	username: 'freost',
+	email: 'freost@example.org',
+	avatars: [['url' => 'https://example.org/avatar.png']],
 );
 ```
