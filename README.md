@@ -60,7 +60,7 @@ class User extends DataClass
 	public string $email;
 
 	#[Validator('username')]
-	protected function usernameMustContainSpace(string $username): string
+	protected function usernameMustNotContainSpace(string $username): string
 	{
 		if(str_contains($username, ' ') === true)
 			throw new ValueError('username must not contain a space');
