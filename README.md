@@ -76,3 +76,33 @@ $user = new User(
 	email: 'freost@example.org',
 );
 ```
+
+### Nested data classes
+
+```php
+<?php
+
+use mako\dataclass\DataClass;
+use mako\dataclass\attributes\Validator;
+
+class Avatar extends DataClass
+{
+	public string $url;
+}
+
+class User extends DataClass
+{
+	public string $username;
+	public string $email;
+	public Avatar $avatar;
+}
+
+// The avatar property will be instantiated as a Avatar instance
+
+$user = new User(
+	username: 'freost',
+	email: 'freost@example.org',
+	avatar: ['url' => 'https://example.org/avatar.png'],
+
+);
+```
