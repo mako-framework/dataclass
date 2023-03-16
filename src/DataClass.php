@@ -14,9 +14,10 @@ use ReflectionClass;
 use ReflectionNamedType;
 use ReflectionProperty;
 use RuntimeException;
-use stdClass;
 
 use function array_diff_key;
+use function array_key_exists;
+use function array_walk_recursive;
 use function class_parents;
 use function count;
 use function implode;
@@ -187,15 +188,15 @@ abstract class DataClass implements JsonSerializable
 			$array[$name] = $this->$name;
 		}
 
-		return $array;
-	}
+		array_walk_recursive($array, function (&$value): void
+		{
+			if($value instanceof self)
+			{
+				$value = $value->toArray();
+			}
+		});
 
-	/**
-	 * Returns a stdClass representation of the data class.
-	 */
-	final public function toObject(): stdClass
-	{
-		return (object) $this->toArray();
+		return $array;
 	}
 
 	/**
