@@ -13,8 +13,7 @@ class Avatar extends DataClass
 	#[Validator('url')]
 	protected function validateEmail(string $url): string
 	{
-		if(str_starts_with($url, 'https://') === false)
-		{
+		if (str_starts_with($url, 'https://') === false) {
 			throw new ValueError("Url must start with 'https://'.");
 		}
 

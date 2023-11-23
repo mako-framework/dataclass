@@ -20,8 +20,8 @@ final class Validator
 	 */
 	public function __construct(
 		protected string $property
-	)
-	{}
+	) {
+	}
 
 	/**
 	 * Returns the validator target name.

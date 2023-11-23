@@ -25,8 +25,7 @@ class User extends DataClass
 	#[Validator('email')]
 	protected function validateEmail(string $email): string
 	{
-		if(str_contains($email, '@') === false)
-		{
+		if (str_contains($email, '@') === false) {
 			throw new ValueError("Email must contain an '@'.");
 		}
 

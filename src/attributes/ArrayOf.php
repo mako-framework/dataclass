@@ -20,8 +20,8 @@ final class ArrayOf
 	 */
 	public function __construct(
 		protected string $type
-	)
-	{}
+	) {
+	}
 
 	/**
 	 * Returns the type.

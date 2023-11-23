@@ -41,48 +41,38 @@ abstract class DataClass implements JsonSerializable
 	{
 		// Cache property details
 
-		if(array_key_exists(static::class, static::$__cache__) === false)
-		{
+		if (array_key_exists(static::class, static::$__cache__) === false) {
 			static::cachePropDetails();
 		}
 
 		// Check for missing required properties
 
-		if(!empty($missing = array_diff_key(static::$__cache__[static::class]['required_props'], $props)))
-		{
+		if (!empty($missing = array_diff_key(static::$__cache__[static::class]['required_props'], $props))) {
 			throw new RuntimeException(vsprintf('Missing required %s: %s.', [count($missing) > 1 ? 'properties' : 'property', implode(',', $missing)]));
 		}
 
 		// Initialize properties
 
-		foreach($props as $name => $value)
-		{
-			if($value !== null)
-			{
+		foreach ($props as $name => $value) {
+			if ($value !== null) {
 				$propInfo = static::$__cache__[static::class]['prop_info'][$name];
 
-				if($propInfo['dataclass'] !== null)
-				{
-					if($propInfo['is_array'])
-					{
+				if ($propInfo['dataclass'] !== null) {
+					if ($propInfo['is_array']) {
 						$dataclasses = [];
 
-						foreach($value as $valueData)
-						{
+						foreach ($value as $valueData) {
 							$dataclasses[] = new $propInfo['dataclass'](...$valueData);
 						}
 
 						$value = $dataclasses;
 					}
-					else
-					{
+					else {
 						$value = new $propInfo['dataclass'](...$value);
 					}
 				}
-				else
-				{
-					foreach($propInfo['validators'] as $validator)
-					{
+				else {
+					foreach ($propInfo['validators'] as $validator) {
 						$value = $this->{$validator}($value);
 					}
 				}
@@ -106,8 +96,7 @@ abstract class DataClass implements JsonSerializable
 
 		// Cache property details
 
-		foreach($reflection->getProperties(ReflectionProperty::IS_PUBLIC) as $prop)
-		{
+		foreach ($reflection->getProperties(ReflectionProperty::IS_PUBLIC) as $prop) {
 			$propName = $prop->getName();
 
 			static::$__cache__[static::class]['prop_info'][$propName] = [
@@ -118,8 +107,7 @@ abstract class DataClass implements JsonSerializable
 
 			// Cache required properties
 
-			if($prop->hasDefaultValue() === false)
-			{
+			if ($prop->hasDefaultValue() === false) {
 				static::$__cache__[static::class]['required_props'][$propName] = $propName;
 			}
 
@@ -127,28 +115,22 @@ abstract class DataClass implements JsonSerializable
 
 			$type = $prop->getType();
 
-			if($type instanceof ReflectionNamedType)
-			{
-				if($type->isBuiltin())
-				{
-					if($type->getName() === 'array')
-					{
+			if ($type instanceof ReflectionNamedType) {
+				if ($type->isBuiltin()) {
+					if ($type->getName() === 'array') {
 						static::$__cache__[static::class]['prop_info'][$propName]['is_array'] = true;
 
 						$attributes = $prop->getAttributes(ArrayOf::class);
 
-						if(!empty($attributes))
-						{
+						if (!empty($attributes)) {
 							static::$__cache__[static::class]['prop_info'][$propName]['dataclass'] = $attributes[0]->newInstance()->getType();
 						}
 					}
 				}
-				else
-				{
+				else {
 					$typeName = $type->getName();
 
-					if(in_array(self::class, class_parents($typeName)))
-					{
+					if (in_array(self::class, class_parents($typeName))) {
 						static::$__cache__[static::class]['prop_info'][$propName]['dataclass'] = $typeName;
 					}
 				}
@@ -157,12 +139,10 @@ abstract class DataClass implements JsonSerializable
 
 		// Cache property validators
 
-		foreach($reflection->getMethods() as $method)
-		{
+		foreach ($reflection->getMethods() as $method) {
 			$attributes = $method->getAttributes(Validator::class);
 
-			foreach($attributes as $attribute)
-			{
+			foreach ($attributes as $attribute) {
 				$property = $attribute->newInstance()->getProperty();
 
 				static::$__cache__[static::class]['prop_info'][$property]['validators'][] = $method->getName();
@@ -181,17 +161,14 @@ abstract class DataClass implements JsonSerializable
 
 		$props = $reflection->getProperties(ReflectionProperty::IS_PUBLIC);
 
-		foreach($props as $prop)
-		{
+		foreach ($props as $prop) {
 			$name = $prop->getName();
 
 			$array[$name] = $this->$name;
 		}
 
-		array_walk_recursive($array, function (&$value): void
-		{
-			if($value instanceof self)
-			{
+		array_walk_recursive($array, function (&$value): void {
+			if ($value instanceof self) {
 				$value = $value->toArray();
 			}
 		});
