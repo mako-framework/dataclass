@@ -44,6 +44,8 @@ $json = <<<JSON
 }
 JSON;
 
+$user = User::fromJSON($json);
+
 $user = new User(...json_decode($json, associative: true));
 ```
 

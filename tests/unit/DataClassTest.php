@@ -182,4 +182,16 @@ class DataClassTest extends TestCase
 
 		$this->assertSame($json, json_encode($user));
 	}
+
+	/**
+	 *
+	 */
+	public function testFromJson(): void
+	{
+		$json = '{"name":"Frederic","username":"freost","email":"freost@example.org","avatar":null,"links":[]}';
+
+		$user = User::fromJSON($json);
+
+		$this->assertSame($json, json_encode($user));
+	}
 }
