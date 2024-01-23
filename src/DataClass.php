@@ -151,7 +151,7 @@ abstract class DataClass implements JsonSerializable
 	}
 
 	/**
-	 * Creates a new instance from JSON object.
+	 * Creates a new instance from a JSON string.
 	 */
 	final public static function fromJSON(string $json): static
 	{
