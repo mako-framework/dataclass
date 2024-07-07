@@ -65,8 +65,9 @@ class User extends DataClass
 	#[Validator('username')]
 	protected function usernameMustNotContainSpace(string $username): string
 	{
-		if(str_contains($username, ' ') === true)
+		if(str_contains($username, ' ') === true) {
 			throw new ValueError('username must not contain a space');
+		}
 
 		return $username;
 	}
